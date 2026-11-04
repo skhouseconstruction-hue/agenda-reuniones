@@ -518,6 +518,48 @@ body.personal-agenda-mode #appRedesignSidebar{background:#fff}
 }
 
 </style>
+
+<style id="miAgendaMobileComfortFix">
+/* V43: comodidad de lectura y trabajo en teléfonos; escritorio y Mac no se modifican. */
+*,*::before,*::after{box-sizing:border-box}
+@media (max-width:680px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
+  #appRedesignShell{width:100%;max-width:100%;grid-template-columns:minmax(0,1fr);overflow-x:hidden}
+  #appRedesignMain{width:100%;max-width:100%;min-width:0;padding:12px 12px 30px;overflow-x:hidden}
+  #appRedesignMain>*{width:100%;max-width:100%;min-width:0}
+  #appRedesignMain>section.panel,#appRedesignMain>section:not(#home){margin-left:0;margin-right:0}
+  #appRedesignMain .panel{padding:16px!important;border-radius:16px}
+  #appRedesignMain .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  #appRedesignMain .card{height:auto;min-height:142px;padding:10px;min-width:0}
+  #appRedesignMain .card span,#appRedesignMain .card strong{font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+  #appRedesignMain input:not([type=checkbox]):not([type=radio]),
+  #appRedesignMain select,#appRedesignMain textarea,
+  #miOrganizerPanel input,#miOrganizerPanel select,#miOrganizerPanel textarea{
+    max-width:100%;min-width:0;font-size:16px!important;line-height:1.35
+  }
+  #appRedesignMain button,#miOrganizerPanel button{max-width:100%;white-space:normal;line-height:1.3}
+  #appRedesignMain img{max-width:100%}
+  #appRedesignMain table,#miOrganizerPanel table{max-width:100%}
+  #miOrganizerPanel{width:100%;max-width:100%;padding:12px!important;overflow:hidden}
+  #miOrganizerPanel .mo-head{align-items:flex-start}
+  #miOrganizerPanel .mo-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #appRedesignMobileBar{width:100%;padding:8px 0 12px;gap:10px}
+  #appRedesignMobileTitle{font-size:17px;line-height:1.25}
+}
+@media(max-width:420px){
+  #appRedesignMain{padding-left:10px;padding-right:10px}
+  #appRedesignMain .panel{padding:14px!important}
+  #appRedesignMain .grid{gap:9px}
+  #appRedesignMain .card{min-height:130px;padding:8px}
+  #appRedesignMain .card span,#appRedesignMain .card strong{font-size:13px}
+  #appRedesignSidebar{width:min(300px,88vw);padding:16px 12px}
+}
+@media(min-width:681px){
+  /* Mantiene intacta la composición de escritorio/tableta ancha. */
+  #appRedesignShell{width:100%}
+}
+</style>
+
 </head>
 <body>
 <section id="agendaChooser" aria-label="Seleccionar agenda">
