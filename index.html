@@ -2451,7 +2451,7 @@ async function checkReminders(){const now=Date.now();let changed=false;for(const
 setInterval(checkReminders,30000);setInterval(()=>{const p=$('elderMeetingPreviewScreen');if(p&&!p.classList.contains('hidden'))renderNextElderMeetingPreview()},15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkReminders();const p=$('elderMeetingPreviewScreen');if(p&&!p.classList.contains('hidden'))renderNextElderMeetingPreview()}});
 async function del(id){if(!confirm('¿Eliminar esta actividad?'))return;const previousEvents=events;events=events.filter(e=>String(e.id)!==String(id));if(!save()){events=previousEvents;return;}try{await nvDeleteMedia(id)}catch(e){console.warn('La actividad se eliminó, pero no se pudieron limpiar todos sus archivos multimedia:',e)}renderAgenda()}
 </script>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='meetingLibrarySearchQuery'){e.preventDefault();meetingLibrarySearch();}});
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});}document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='meetingLibrarySearchQuery'){e.preventDefault();meetingLibrarySearch();}});
 </script>
 
 

@@ -1,56 +1,35 @@
-const CACHE = 'mi-agenda-v10';
-
-const ASSETS = [
-  './',
-  './index.html',
-  './literatura.js',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
-];
+const CACHE = 'mi-agenda-v11';
+const PRECACHE = ['./index.html','./literatura.js','./manifest.json'];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PRECACHE)));
   self.skipWaiting();
 });
-
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys
-        .filter(key => key !== CACHE)
-        .map(key => caches.delete(key))
-    )).then(() => self.clients.claim())
-  );
+  event.waitUntil(caches.keys().then(keys => Promise.all(
+    keys.filter(key => key.startsWith('mi-agenda-') && key !== CACHE).map(key => caches.delete(key))
+  )).then(() => self.clients.claim()));
 });
-
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-
-  const url = new URL(event.request.url);
-
-  if (
-    url.pathname.endsWith('/index.html') ||
-    url.pathname.endsWith('/')
-  ) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE).then(cache => {
-            cache.put(event.request, copy);
-          });
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  if (request.mode === 'navigate' || url.pathname.endsWith('/index.html') || url.pathname.endsWith('/')) {
+    event.respondWith(fetch(request,{cache:'no-cache'}).then(response => {
+      if (response && response.ok) {
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put('./index.html',copy));
+      }
+      return response;
+    }).catch(()=>caches.match('./index.html')));
     return;
   }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
+  event.respondWith(caches.match(request).then(cached=>{
+    if(cached)return cached;
+    return fetch(request).then(response=>{
+      if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}
+      return response;
+    });
+  }));
 });
