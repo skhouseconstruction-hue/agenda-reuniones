@@ -1,8 +1,9 @@
-const CACHE = 'mi-agenda-v2';
+const CACHE = 'mi-agenda-v3';
 
 const ASSETS = [
   './',
   './index.html',
+  './literatura.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
