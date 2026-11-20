@@ -596,6 +596,22 @@ body.personal-agenda-mode #appRedesignSidebar{background:#fff}
 }
 </style>
 
+
+<style id="return-button-compact-v14">
+/* Botón Volver compacto: visible y accesible sin ocupar una franja superior. */
+html body #appRedesignMain>#returnAgendaChooserBtn{
+ position:fixed!important;z-index:10000!important;
+ top:calc(env(safe-area-inset-top,0px) + 8px)!important;left:12px!important;
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:auto!important;min-width:0!important;min-height:32px!important;
+ margin:0!important;padding:6px 10px!important;
+ border:1px solid rgba(200,217,241,.9)!important;border-radius:999px!important;
+ background:rgba(255,255,255,.94)!important;color:#315578!important;
+ font:600 12px/1.2 system-ui,sans-serif!important;
+ box-shadow:0 2px 8px rgba(23,52,95,.14)!important;cursor:pointer!important;
+ -webkit-tap-highlight-color:transparent;
+}
+</style>
 </head>
 <body>
 <section id="agendaChooser" aria-label="Seleccionar agenda">
