@@ -2600,10 +2600,10 @@ async function del(id){if(!confirm('¿Eliminar esta actividad?'))return;const pr
  }
  function setPersonalMode(){currentMode='personal';setAgendaSwitcherActive('personal');document.body.classList.add('personal-agenda-mode');document.body.classList.remove('redesign-menu-open');brand.querySelector('#appRedesignBrandText').textContent='Agenda personal';nav.innerHTML='';const b=addNav('Agenda personal','▣',()=>{if(typeof window.openPersonalAgenda==='function')window.openPersonalAgenda()});setActive(b);}
  // Las dos pantallas de selección y las vistas previas permanecen intactas.
- const oldMain=window.enterMainAgendaAppFromPreview;window.enterMainAgendaAppFromPreview=function(){if(oldMain)oldMain();setMainMode();if(typeof window.showServiceMonth==='function')window.showServiceMonth()};
+ const oldMain=window.enterMainAgendaAppFromPreview;window.enterMainAgendaAppFromPreview=function(){if(oldMain)oldMain();setMainMode();if(isServicePreviewAtStart()&&typeof window.showServiceMonth==='function')window.showServiceMonth()};
  // Al salir de cualquier módulo del panel principal, volver al resumen mensual en el panel derecho.
  const originalGoHome=window.goHome;
- window.goHome=function(){if(originalGoHome)originalGoHome();if(currentMode==='main'&&typeof window.showServiceMonth==='function')window.showServiceMonth()};
+ window.goHome=function(){if(originalGoHome)originalGoHome();if(currentMode==='main'&&isServicePreviewAtStart()&&typeof window.showServiceMonth==='function')window.showServiceMonth()};
  const oldPersonal=window.enterPersonalAgendaApp;window.enterPersonalAgendaApp=function(){if(oldPersonal)oldPersonal();setPersonalMode()};
  const oldOpenPersonal=window.openPersonalAgenda;window.openPersonalAgenda=function(){if(oldOpenPersonal)oldOpenPersonal();setPersonalMode()};
  const oldClosePersonal=window.closePersonalAgenda;window.closePersonalAgenda=function(){if(oldClosePersonal)oldClosePersonal();setMainMode()};
