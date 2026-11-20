@@ -1,5 +1,5 @@
-const CACHE = 'mi-agenda-v3-literatura';
-const ASSETS = ['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./literatura.js'];
+const CACHE='mi-agenda-v3-literatura';
+const ASSETS=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./literatura.js'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
@@ -9,7 +9,7 @@ self.addEventListener('fetch',event=>{
   event.respondWith(fetch(event.request).then(async response=>{
    if(!response.ok)return response;
    let body=await response.text();
-   if(!body.includes('literatura.js'))body=body.replace(/<\\/body>/i,'<script src="./literatura.js"></script>\\n</body>');
+   if(!body.includes('literatura.js')){const at=body.toLowerCase().lastIndexOf('</body>');if(at>=0)body=body.slice(0,at)+'<script src="./literatura.js"></script>\\n'+body.slice(at);}
    const headers=new Headers(response.headers);headers.delete('content-length');
    const enhanced=new Response(body,{status:response.status,statusText:response.statusText,headers});
    caches.open(CACHE).then(cache=>cache.put(event.request,enhanced.clone()));
