@@ -1,4 +1,4 @@
-const CACHE = 'mi-agenda-v16';
+const CACHE = 'mi-agenda-v17';
 const PRECACHE = ['./index.html','./literatura.js','./manifest.json'];
 
 self.addEventListener('install', event => {
