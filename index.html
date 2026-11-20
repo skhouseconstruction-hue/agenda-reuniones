@@ -843,6 +843,13 @@ html body #appRedesignMain>#returnAgendaChooserBtn{
 <div class="service-profile"><div><label>Nombre</label><input id="serviceName" type="text" placeholder="Nombre"></div><div><label>Congregación</label><input id="serviceCongregation" type="text" placeholder="Congregación"></div></div>
 <div class="actions"><button class="btn primary" type="button" onclick="saveServiceProfile()">GUARDAR DATOS</button></div>
 </div>
+<div class="service-form" style="margin-top:14px">
+<h3 style="margin:0 0 8px">Inicio de Mi servicio</h3>
+<label for="servicePreviewAtStart" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+<input id="servicePreviewAtStart" type="checkbox" style="width:22px;height:22px;flex:none" onchange="saveServicePreviewAtStart(this.checked)">
+<span><strong>Seleccionar vista previa al inicio de mi servicio</strong><small style="display:block;color:#687386;margin-top:4px">Si está activada, se abrirá directamente «Servicio durante el mes». Si está desactivada, aparecerá el menú de Mi servicio.</small></span>
+</label>
+</div>
 </div>
 </section>
 
@@ -918,6 +925,7 @@ const BACKUP_KEY='mi_agenda_reuniones_backup_v1';
 const SERVICE_KEY='mi_agenda_servicio_v1';
 const SERVICE_BACKUP_KEY='mi_agenda_servicio_backup_v1';
 const SERVICE_PROFILE_KEY='mi_agenda_servicio_perfil_v1';
+const SERVICE_PREVIEW_START_KEY='mi_agenda_servicio_vista_previa_inicio_v1';
 const STUDY_KEY='mi_agenda_estudios_v1';
 const STUDY_BACKUP_KEY='mi_agenda_estudios_backup_v1';
 function localDateISO(){const d=new Date(),z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
@@ -2167,13 +2175,15 @@ function deletePastEvent(id){const e=events.find(x=>String(x.id)===String(id));i
 function editServiceFromHistory(id){showService();editService(id)}
 function deleteServiceFromHistory(id){deleteServiceRecord(id);renderPastHistory()}
 function showAgenda(){$('home').classList.add('hidden');$('formPanel').classList.add('hidden');$('nextVisitPanel').classList.add('hidden');$('servicePanel').classList.add('hidden');$('configPanel').classList.add('hidden');$('serviceMonthPanel').classList.add('hidden');$('agendaPanel').classList.remove('hidden');buildMonths();renderAgenda();scrollTo(0,0)}
+function isServicePreviewAtStart(){try{return localStorage.getItem(SERVICE_PREVIEW_START_KEY)==='true'}catch(e){return false}}
+function saveServicePreviewAtStart(enabled){try{localStorage.setItem(SERVICE_PREVIEW_START_KEY,enabled?'true':'false')}catch(e){alert('No se pudo guardar esta preferencia en el dispositivo.');const toggle=$('servicePreviewAtStart');if(toggle)toggle.checked=false}}
 function showServiceMonth(){
   loadServiceProfile();
   ['home','formPanel','nextVisitPanel','agendaPanel','servicePanel','configPanel','pastoreoPanel','pastHistoryPanel','personalAgendaPanel'].forEach(id=>{const el=$(id);if(el)el.classList.add('hidden')});
   $('serviceMonthPanel').classList.remove('hidden');
   renderServiceMonth();scrollTo(0,0);
 }
-function showService(){loadServiceProfile();if($('serviceEntryForm'))$('serviceEntryForm').classList.add('hidden');
+function showService(){loadServiceProfile();if(isServicePreviewAtStart()){showServiceMonth();return;}if($('serviceEntryForm'))$('serviceEntryForm').classList.add('hidden');
 $('home').classList.add('hidden');$('formPanel').classList.add('hidden');$('nextVisitPanel').classList.add('hidden');$('agendaPanel').classList.add('hidden');$('configPanel').classList.add('hidden');$('serviceMonthPanel').classList.add('hidden');$('servicePanel').classList.remove('hidden');
 const now=localMonthISO();
 if(!$('serviceDate').value)$('serviceDate').value=localDateISO();
@@ -2182,7 +2192,7 @@ renderServiceHomeSummary();
 if(!$('studyDate').value)$('studyDate').value=localDateISO();
 clearServiceForm();toggleServiceDetail();renderService();scrollTo(0,0)
 }
-function showConfiguration(){loadServiceProfile();$('home').classList.add('hidden');$('formPanel').classList.add('hidden');$('nextVisitPanel').classList.add('hidden');$('agendaPanel').classList.add('hidden');$('servicePanel').classList.add('hidden');$('serviceMonthPanel').classList.add('hidden');$('configPanel').classList.remove('hidden');scrollTo(0,0)}
+function showConfiguration(){loadServiceProfile();const previewToggle=$('servicePreviewAtStart');if(previewToggle)previewToggle.checked=isServicePreviewAtStart();$('home').classList.add('hidden');$('formPanel').classList.add('hidden');$('nextVisitPanel').classList.add('hidden');$('agendaPanel').classList.add('hidden');$('servicePanel').classList.add('hidden');$('serviceMonthPanel').classList.add('hidden');$('configPanel').classList.remove('hidden');scrollTo(0,0)}
 function goHome(){const pp=$('pastoreoPanel');if(pp)pp.classList.add('hidden');if($('pastHistoryPanel'))$('pastHistoryPanel').classList.add('hidden');$('formPanel').classList.add('hidden');$('nextVisitPanel').classList.add('hidden');$('agendaPanel').classList.add('hidden');$('servicePanel').classList.add('hidden');$('configPanel').classList.add('hidden');$('serviceMonthPanel').classList.add('hidden');$('home').classList.remove('hidden');updateServiceHeader()}
 function openServiceEntry(){const form=$('serviceEntryForm');if(form)form.classList.remove('hidden');clearServiceForm();$('serviceSaveButton').textContent='💾 GUARDAR DÍA';scrollTo(0,0)}
 function closeServiceEntry(){const form=$('serviceEntryForm');if(form)form.classList.add('hidden');$('serviceSaveButton').textContent='💾 GUARDAR DÍA'}
