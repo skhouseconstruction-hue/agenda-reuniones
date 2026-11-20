@@ -498,7 +498,7 @@ body.personal-agenda-mode #appRedesignSidebar{background:#fff}
  body.redesign-menu-open #redesignBackdrop{opacity:1;pointer-events:auto}
  #appRedesignMain{padding:10px 12px 28px}
  #appRedesignMobileBar{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;background:#f3f7fc;padding:7px 0 12px;margin-bottom:5px}
- #appRedesignMenuToggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:88px;width:auto;height:42px;padding:0 13px;border:1px solid #dce6f3;border-radius:12px;background:white;color:#174b91;font-size:14px;font-weight:800;letter-spacing:.3px;cursor:pointer;box-shadow:0 3px 10px rgba(23,75,145,.08);position:relative;z-index:40}
+ #appRedesignMenuToggle{width:42px;height:40px;border:1px solid #dce6f3;border-radius:12px;background:white;color:#174b91;font-size:20px;cursor:pointer}
  #appRedesignMobileTitle{font-size:16px;font-weight:800;color:#173f72}
  #appRedesignMain .agenda-header{border-radius:14px;margin-bottom:12px}
  #appRedesignMain .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -2567,7 +2567,7 @@ async function del(id){if(!confirm('¿Eliminar esta actividad?'))return;const pr
  const footer=document.createElement('div');footer.className='redesign-sidebar-footer';
  const returnBtn=document.createElement('button');returnBtn.type='button';returnBtn.className='redesign-nav-btn';returnBtn.innerHTML='<span class="redesign-nav-icon">↩</span><span>Elegir otra agenda</span>';returnBtn.addEventListener('click',()=>{document.body.classList.remove('redesign-menu-open');if(typeof window.returnToAgendaChooser==='function')window.returnToAgendaChooser()});footer.append(returnBtn);sidebar.append(footer);
  const main=document.createElement('main');main.id='appRedesignMain';
- const mobile=document.createElement('div');mobile.id='appRedesignMobileBar';mobile.innerHTML='<button id="appRedesignMenuToggle" type="button" aria-label="Abrir menú">☰ MENÚ</button><span id="appRedesignMobileTitle">Mi Agenda</span>';
+ const mobile=document.createElement('div');mobile.id='appRedesignMobileBar';mobile.innerHTML='<button id="appRedesignMenuToggle" type="button" aria-label="Abrir menú">☰</button><span id="appRedesignMobileTitle">Mi Agenda</span>';
  main.append(mobile);
  const backdrop=document.createElement('div');backdrop.id='redesignBackdrop';backdrop.addEventListener('click',()=>document.body.classList.remove('redesign-menu-open'));
  const originalChildren=[...app.children];
