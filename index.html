@@ -2602,9 +2602,8 @@ async function del(id){if(!confirm('¿Eliminar esta actividad?'))return;const pr
  const map=[['nextVisitPanel',['Próxima visita']],['agendaPanel',['Ver Agenda']],['servicePanel',['Mi servicio']],['configPanel',['Configuración']],['serviceMonthPanel',['Informe de mes']],['pastoreoPanel',['Visita de pastoreo']],['pastHistoryPanel',['Historial de fechas anteriores']]];
  const observer=new MutationObserver(()=>{if(currentMode!=='main')return;const form=$('formPanel');if(form&&!form.classList.contains('hidden')){const type=$('type')?.value;const label=type==='Asignación'?'Asignación':type==='Reunión'?'Cartas y Anuncios':null;const b=[...nav.querySelectorAll('.redesign-nav-btn')].find(x=>x.dataset.label===label);if(b)setActive(b);return}for(const [id,labels] of map){const el=$(id);if(el&&!el.classList.contains('hidden')){const b=[...nav.querySelectorAll('.redesign-nav-btn')].find(x=>labels.includes(x.dataset.label));if(b)setActive(b);return}}const home=$('home');if(home&&!home.classList.contains('hidden'))setActive(nav.querySelector('.redesign-nav-btn'))});
  observer.observe(app,{subtree:true,attributes:true,attributeFilter:['class','style']});
- // Entrada directa: omite la pantalla inicial de elección y abre Mi Agenda con el menú lateral visible.
- window.enterMainAgendaAppFromPreview();
- if(window.matchMedia('(max-width:680px)').matches)document.body.classList.add('redesign-menu-open');
+ // Inicio: conservar visible la pantalla de selección hasta que el usuario elija una agenda.
+ // No abrir Mi Agenda automáticamente al cargar o actualizar la aplicación.
 })();
 </script>
 
