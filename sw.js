@@ -1,4 +1,4 @@
-const CACHE = 'mi-agenda-v4';
+const CACHE = 'mi-agenda-v5';
 
 const ASSETS = [
   './',
