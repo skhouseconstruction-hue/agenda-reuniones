@@ -47,6 +47,107 @@ if(tableWrap){
 
 }
 
+
+/* PROGRAMAS ADJUNTOS: módulo independiente del formulario y de la tabla */
+const PROGRAMAS_KEY='miAgendaLiteraturaProgramas_v1';
+let programas=[];
+try{const p=JSON.parse(localStorage.getItem(PROGRAMAS_KEY)||'[]');programas=Array.isArray(p)?p:[]}catch(e){}
+const programaUrls=new Map();
+let programasRenderToken=0;
+function saveProgramas(){try{localStorage.setItem(PROGRAMAS_KEY,JSON.stringify(programas));return true}catch(e){const s=$('litProgramasStatus');if(s)s.textContent='No se pudo guardar la lista de programas.';return false}}
+function clearProgramaUrls(){programaUrls.forEach(url=>URL.revokeObjectURL(url));programaUrls.clear()}
+function programaPreviewMarkup(meta,url){
+ const type=String(meta.type||'').toLowerCase();
+ if(type==='application/pdf'||/\.pdf$/i.test(meta.name||''))return '<iframe class="lit-programa-frame" title="Vista previa de '+esc(meta.name)+'" src="'+url+'"></iframe>';
+ if(type.startsWith('image/'))return '<img class="lit-programa-image" alt="'+esc(meta.name)+'" src="'+url+'">';
+ if(type.startsWith('video/'))return '<video class="lit-programa-media" controls playsinline src="'+url+'"></video>';
+ if(type.startsWith('audio/'))return '<audio class="lit-programa-audio" controls src="'+url+'"></audio>';
+ if(type.startsWith('text/'))return '<iframe class="lit-programa-frame" title="Vista previa de '+esc(meta.name)+'" src="'+url+'"></iframe>';
+ return '<div class="lit-programa-no-preview"><span>📄</span><strong>Vista previa no disponible para este formato</strong><a href="'+url+'" target="_blank" rel="noopener">Abrir archivo</a></div>';
+}
+async function renderProgramas(){
+ const list=$('litProgramasList');if(!list)return;
+ const token=++programasRenderToken;clearProgramaUrls();list.innerHTML='';
+ if(!programas.length){list.innerHTML='<div class="lit-programas-empty">Todavía no hay programas adjuntos. Utiliza el botón verde para agregar uno.</div>';return}
+ for(const meta of programas){
+  let file=null;try{file=await fileGet(meta.id)}catch(e){}
+  if(token!==programasRenderToken)return;
+  const card=document.createElement('article');card.className='lit-programa-item';
+  const head=document.createElement('div');head.className='lit-programa-item-head';
+  const info=document.createElement('div');info.className='lit-programa-file-info';
+  const name=document.createElement('strong');name.textContent=meta.name||'Programa adjunto';
+  const detail=document.createElement('small');detail.textContent=(meta.size?((meta.size/1024/1024).toFixed(2)+' MB · '):'')+'Guardado en este dispositivo';
+  info.append(name,detail);
+  const del=document.createElement('button');del.type='button';del.className='lit-programa-delete';del.dataset.litProgramaDelete=meta.id;del.textContent='🗑 Eliminar';del.setAttribute('aria-label','Eliminar '+(meta.name||'programa'));
+  head.append(info,del);card.appendChild(head);
+  const stage=document.createElement('div');stage.className='lit-programa-preview';
+  if(file){
+   const url=URL.createObjectURL(file);programaUrls.set(meta.id,url);
+   stage.innerHTML=programaPreviewMarkup(meta,url);
+  }else{
+   stage.innerHTML='<div class="lit-programa-no-preview"><span>⚠️</span><strong>No se encontró el archivo guardado</strong></div>';
+  }
+  card.appendChild(stage);list.appendChild(card);
+ }
+}
+const programasCard=document.createElement('section');
+programasCard.className='lit-card lit-programas-card';
+programasCard.innerHTML='<div class="lit-programas-head"><div><h3>Programas adjuntos</h3><p>Los archivos se conservan aquí, independientes de los registros.</p></div></div><div class="lit-programas-action"><label class="lit-programa-add" for="litProgramasInput">＋ Adjuntar programa</label><input id="litProgramasInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.txt,.mp4,.webm,.mp3,.wav,.doc,.docx,.ppt,.pptx"></div><div id="litProgramasList" class="lit-programas-list"></div><div id="litProgramasStatus" class="lit-programas-status">Los programas adjuntos se guardan automáticamente en este dispositivo.</div>';
+const programasStyle=document.createElement('style');
+programasStyle.textContent=`
+#literaturaPanel .lit-programas-card{padding:16px;overflow:visible}
+#literaturaPanel .lit-programas-head h3{margin:0;color:#102b52;font-size:19px;font-weight:800}
+#literaturaPanel .lit-programas-head p{margin:5px 0 14px;color:#64748b;font-size:13px;line-height:1.4}
+#literaturaPanel .lit-programas-action{padding:0 0 14px}
+#literaturaPanel .lit-programa-add{display:flex;align-items:center;justify-content:center;min-height:54px;width:100%;padding:13px 18px;border:0;border-radius:11px;background:#15965e;color:#fff;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 3px 8px rgba(21,150,94,.2)}
+#literaturaPanel #litProgramasInput{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#literaturaPanel .lit-programas-list{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+#literaturaPanel .lit-programas-empty{padding:18px 12px;border:1px dashed #cbd7e5;border-radius:10px;color:#718096;text-align:center;font-size:13px}
+#literaturaPanel .lit-programa-item{min-width:0;border:1px solid #d6deea;border-radius:12px;background:#fff;overflow:hidden}
+#literaturaPanel .lit-programa-item-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border-bottom:1px solid #e5eaf1}
+#literaturaPanel .lit-programa-file-info{display:flex;flex-direction:column;gap:4px;min-width:0}
+#literaturaPanel .lit-programa-file-info strong{color:#1b3b61;font-size:14px;overflow-wrap:anywhere}
+#literaturaPanel .lit-programa-file-info small{color:#718096;font-size:11px}
+#literaturaPanel .lit-programa-delete{flex:0 0 auto;border:0;border-radius:8px;background:#fff0f0;color:#b43c3c;padding:9px 11px;font-size:12px;font-weight:800;cursor:pointer}
+#literaturaPanel .lit-programa-preview{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:650px;overflow:auto;background:#eef2f7}
+#literaturaPanel .lit-programa-frame{display:block;width:100%;height:620px;border:0;background:#fff}
+#literaturaPanel .lit-programa-image{display:block;max-width:100%;max-height:620px;object-fit:contain}
+#literaturaPanel .lit-programa-media{display:block;width:100%;max-height:520px}
+#literaturaPanel .lit-programa-audio{width:calc(100% - 24px);margin:20px 12px}
+#literaturaPanel .lit-programa-no-preview{display:flex;flex-direction:column;align-items:center;gap:9px;padding:25px;text-align:center;color:#64748b;font-size:13px}
+#literaturaPanel .lit-programa-no-preview span{font-size:34px}
+#literaturaPanel .lit-programa-no-preview a{color:#24558e;font-weight:800}
+#literaturaPanel .lit-programas-status{padding-top:10px;color:#718096;font-size:11px}
+@media(max-width:767px){#literaturaPanel .lit-programas-card{padding:13px}#literaturaPanel .lit-programa-add{min-height:52px;font-size:16px}#literaturaPanel .lit-programa-frame{height:65vh;min-height:360px}#literaturaPanel .lit-programa-image{max-height:65vh}#literaturaPanel .lit-programa-item-head{align-items:flex-start}}
+`;
+document.head.appendChild(programasStyle);
+panel.appendChild(programasCard);
+document.addEventListener('change',async e=>{
+ const input=e.target;if(!input||input.id!=='litProgramasInput')return;
+ const files=Array.from(input.files||[]);input.value='';
+ if(!files.length)return;
+ const status=$('litProgramasStatus');
+ for(const file of files){
+  const id='programa_'+Date.now()+'_'+Math.random().toString(36).slice(2,9);
+  try{
+   await filePut(id,file);
+   programas.push({id,name:file.name,type:file.type||'',size:file.size||0,addedAt:Date.now()});
+   saveProgramas();
+  }catch(err){if(status)status.textContent='No se pudo guardar '+file.name+'. Revisa el espacio disponible del navegador.'}
+ }
+ await renderProgramas();
+});
+document.addEventListener('click',async e=>{
+ const btn=e.target.closest&&e.target.closest('#literaturaPanel [data-lit-programa-delete]');
+ if(!btn)return;
+ const id=btn.dataset.litProgramaDelete;
+ const meta=programas.find(x=>x.id===id);
+ if(!meta||!confirm('¿Eliminar el programa adjunto "'+meta.name+'"?'))return;
+ try{await fileDelete(id)}catch(err){}
+ programas=programas.filter(x=>x.id!==id);saveProgramas();await renderProgramas();
+});
+
 const main=$('appRedesignMain');if(main)main.appendChild(panel);
+renderProgramas();
 window.addEventListener('beforeunload',closePreview);
 })();
